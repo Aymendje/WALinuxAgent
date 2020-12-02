@@ -10,47 +10,12 @@ trigger:
 
 strategy:
   matrix:
-#    Python26:
-#      python.version: '2.6'
-#      NOSEOPTS: "--verbose"
-#      SETUPOPTS: ""
-#      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
-#      imageToUse: 'ubuntu-16.04'
-    Python27:
-      python.version: '2.7'
-      NOSEOPTS: "--verbose --with-timer"
+    Python26:
+      python.version: '2.6'
+      NOSEOPTS: "--verbose"
       SETUPOPTS: ""
-      PYLINTOPTS: "--rcfile=ci/2.7.pylintrc"
       PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
-      imageToUse: 'ubuntu-18.04'
-#    Python34:
-#      python.version: '3.4'
-#      NOSEOPTS: "--verbose --with-timer"
-#      SETUPOPTS: ""
-#      PYLINTOPTS: "--rcfile=ci/2.7.pylintrc"
-#      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
-#      imageToUse: 'ubuntu-16.04'
-    Python36:
-      python.version: '3.6'
-      NOSEOPTS: "--verbose --with-timer"
-      SETUPOPTS: ""
-      PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
-      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
-      imageToUse: 'ubuntu-18.04'
-    Python37:
-      python.version: '3.7'
-      NOSEOPTS: "--verbose --with-timer"
-      SETUPOPTS: ""
-      PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
-      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
-      imageToUse: 'ubuntu-18.04'
-    Python38:
-      python.version: '3.8'
-      NOSEOPTS: "--verbose --with-coverage --with-xunit --with-timer --cover-erase --cover-inclusive --cover-min-percentage=60 --cover-branches --cover-package=azurelinuxagent --cover-xml"
-      SETUPOPTS: ""
-      PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
-      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
-      imageToUse: 'ubuntu-latest'
+      imageToUse: 'ubuntu-16.04'
 
 pool:
   vmImage: '$(imageToUse)'
@@ -62,7 +27,12 @@ steps:
   displayName: 'Use Python $(python.version)'
 
 - script: |
+    sudo add-apt-repository ppa:deadsnakes/ppa -y
+    sudo apt update -y
+    sudo apt install python2.6 -y
+    sudo update-alternatives --install /usr/bin/python python /usr/bin/python2.6 1
     python -m pip install --upgrade pip
+    pip -V
     pip install -r requirements.txt
     pip install -r test-requirements.txt
   displayName: 'Install dependencies'
