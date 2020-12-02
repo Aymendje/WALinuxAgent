@@ -3,20 +3,13 @@
 set -u
 
 pylint $PYLINTOPTS --jobs=0 $PYLINTFILES &> pylint.output & PYLINT_PID=$!
-nosetests -a '!requires_sudo' tests &> nosetests_no_sudo.output & NOSETESTS_PID=$!
-sudo env "PATH=$PATH" nosetests -a 'requires_sudo' tests &> nosetests_sudo.output & NOSETESTS_SUDO_PID=$!
+nosetests -a '!requires_sudo' tests $NOSEOPTS &> nosetests_no_sudo.output & NOSETESTS_PID=$!
+sudo env "PATH=$PATH" nosetests -a 'requires_sudo' tests $NOSEOPTS &> nosetests_sudo.output & NOSETESTS_SUDO_PID=$!
 
 EXIT_CODE=0
-echo EXIT_CODE = $EXIT_CODE
 wait $PYLINT_PID || EXIT_CODE=$(($EXIT_CODE || $?))
-echo pylint EXIT_CODE=$?
-echo EXIT_CODE = $EXIT_CODE
 wait $NOSETESTS_PID || EXIT_CODE=$(($EXIT_CODE || $?))
-echo nosetests EXIT_CODE=$?
-echo EXIT_CODE = $EXIT_CODE
 wait $NOSETESTS_SUDO_PID || EXIT_CODE=$(($EXIT_CODE || $?))
-echo nosetests sudo EXIT_CODE=$?
-echo EXIT_CODE = $EXIT_CODE
 
 echo "========================================="
 echo "pylint output:"
