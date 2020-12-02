@@ -10,10 +10,46 @@ pool:
   vmImage: 'ubuntu-latest'
 strategy:
   matrix:
+    Python26:
+      python.version: '2.6'
+      env:
+        NOSEOPTS: "--verbose"
+        SETUPOPTS: ""
     Python27:
       python.version: '2.7'
-#    Python36:
-#      python.version: '3.6'
+      env:
+        NOSEOPTS: "--verbose --with-timer"
+        SETUPOPTS: ""
+        PYLINTOPTS: "--rcfile=ci/2.7.pylintrc"
+        PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+    Python34:
+      python.version: '3.4'
+      env:
+        NOSEOPTS: "--verbose --with-timer"
+        SETUPOPTS: ""
+        PYLINTOPTS: "--rcfile=ci/2.7.pylintrc"
+        PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+    Python36:
+      python.version: '3.6'
+      env:
+        NOSEOPTS: "--verbose --with-timer"
+        SETUPOPTS: ""
+        PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
+        PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+    Python37:
+      python.version: '3.7'
+      env:
+        NOSEOPTS: "--verbose --with-timer"
+        SETUPOPTS: ""
+        PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
+        PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+    Python38:
+      python.version: '3.8'
+        env:        
+          NOSEOPTS: "--verbose --with-coverage --with-timer --cover-inclusive --cover-min-percentage=60 --cover-branches --cover-package=azurelinuxagent --cover-xml"
+          SETUPOPTS: ""
+          PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
+          PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
 
 steps:
 - task: UsePythonVersion@0
@@ -28,5 +64,8 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
-    sh ./ci/pylint_and_nosetests.sh
-  displayName: 'pytest'
+    printenv
+    if [[ $TRAVIS_PYTHON_VERSION != 2.6 ]]; then ./ci/pylint_and_nosetests.sh; fi
+    if [[ $TRAVIS_PYTHON_VERSION == 2.6 ]]; then ./ci/nosetests_only.sh; fi
+    if [ ! -z "$SETUPOPTS" ]; then /usr/bin/env python setup.py $SETUPOPTS; fi
+  displayName: 'Run Tests'
