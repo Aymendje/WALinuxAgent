@@ -31,6 +31,7 @@ jobs:
   - job: WorkaroundPython
     dependsOn: InitializePython
     condition: failed()
+    steps:
     - script:  |
         sudo add-apt-repository ppa:deadsnakes/ppa -y
         sudo apt-get update -y
@@ -45,6 +46,7 @@ jobs:
         sudo python get-pip.py
 
   - job: UnitTest
+    steps:
     - script: |
         sudo python -m pip install --upgrade pip
         sudo pip install -r requirements.txt
