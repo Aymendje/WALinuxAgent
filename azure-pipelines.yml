@@ -31,7 +31,7 @@ steps:
     sudo apt-get update -y
     sudo apt install python2.6 -y
     sudo update-alternatives --install /usr/bin/python python /usr/bin/python2.6 1
-    sudo update-alternatives --config
+    sudo update-alternatives --config python
     echo "Installed python2.6"
     python -V
     python -m pip install --upgrade pip
@@ -50,12 +50,13 @@ steps:
     echo export PYLINTOPTS=\"$(PYLINTOPTS)\"
     echo export PYLINTFILES=\"$(PYLINTFILES)\"
     echo echo PYTHON_VERSION=$PYTHON_VERSION
+    exit 1
     export NOSEOPTS="$(NOSEOPTS)"
     export SETUPOPTS="$(SETUPOPTS)"
     export PYLINTOPTS="$(PYLINTOPTS)"
     export PYLINTFILES="$(PYLINTFILES)"
     EXIT_CODE=0
-    ./ci/nosetests_only.sh || EXIT_CODE=$(($EXIT_CODE || $?)); fi
+    ./ci/nosetests_only.sh || EXIT_CODE=$(($EXIT_CODE || $?))
     exit $EXIT_CODE
   displayName: 'Run Tests'
 
