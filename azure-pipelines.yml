@@ -24,21 +24,23 @@ steps:
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '$(python.version)'
+  continueOnError: true
   displayName: 'Use Python $(python.version)'
 
 - script:  |
     sudo add-apt-repository ppa:deadsnakes/ppa -y
     sudo apt-get update -y
-    sudo apt install python2.6 -y
-    sudo update-alternatives --install /usr/bin/python python /usr/bin/python2.6 1
+    sudo apt install python$(python.version) -y
+    sudo update-alternatives --install /usr/bin/python python /usr/bin/python$(python.version) 1
     sudo update-alternatives --config python
     PATH="/usr/bin/${PATH:+:${PATH}}"
     echo $PATH
-    echo "Installed python2.6"
+    echo "Installed python$(python.version)"
     python -V
-    curl https://bootstrap.pypa.io/2.6/get-pip.py -o get-pip.py
+    curl https://bootstrap.pypa.io/$(python.version)/get-pip.py -o get-pip.py
     sudo python get-pip.py
   condition: failed()
+  displayName: 'Manual install $(python.version)'
 
 - script: |
     sudo python -m pip install --upgrade pip
