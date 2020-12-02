@@ -12,8 +12,8 @@ strategy:
   matrix:
     Python27:
       python.version: '2.7'
-    Python36:
-      python.version: '3.6'
+#    Python36:
+#      python.version: '3.6'
 
 steps:
 - task: UsePythonVersion@0
@@ -28,6 +28,5 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
-    ls -alh
-    sh ./cl/pylint_and_nosetests.sh
+    sh ./ci/pylint_and_nosetests.sh
   displayName: 'pytest'
