@@ -32,7 +32,8 @@ steps:
     sudo apt install python2.6 -y
     sudo update-alternatives --install /usr/bin/python python /usr/bin/python2.6 1
     sudo update-alternatives --config python
-    PATH=$PATH:/usr/bin/
+    PATH="/usr/bin/${PATH:+:${PATH}}"
+    echo $PATH
     echo "Installed python2.6"
     python -V
     python -m pip install --upgrade pip
