@@ -22,7 +22,7 @@ pool:
 
 steps:
 - task: UsePythonVersion@0
-  -condition: and(ne(python.version, '3.4'), ne(python.version, '2.6'))
+  condition: and(ne(python.version, '3.4'), ne(python.version, '2.6'))
   inputs:
     versionSpec: '$(python.version)'
   displayName: 'Use Python $(python.version)'
