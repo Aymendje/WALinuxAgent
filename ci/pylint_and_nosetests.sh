@@ -13,7 +13,7 @@ wait $NOSETESTS_PID || EXIT_CODE=$(($EXIT_CODE || $?))
 echo nosetests EXIT_CODE=$?
 wait $NOSETESTS_SUDO_PID || EXIT_CODE=$(($EXIT_CODE || $?))
 echo nosetests sudo EXIT_CODE=$?
-echo combined EXIT_CODE=$(EXIT_CODE)
+echo EXIT_CODE = $EXIT_CODE
 
 echo "========================================="
 echo "pylint output:"

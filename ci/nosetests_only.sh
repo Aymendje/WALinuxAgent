@@ -9,13 +9,10 @@ echo "========================================="
 echo "nosetests -a '!requires_sudo' output"
 echo "========================================="
 nosetests -a '!requires_sudo' tests || EXIT_CODE=$(($EXIT_CODE || $?))
-echo nosetests EXIT_CODE=$?
 
 echo "========================================="
 echo "nosetests -a 'requires_sudo' output"
 echo "========================================="
 sudo env "PATH=$PATH" nosetests -a 'requires_sudo' tests || EXIT_CODE=$(($EXIT_CODE || $?))
-echo nosetests EXIT_CODE=$?
 
-echo EXIT_CODE = $EXIT_CODE
 exit "$EXIT_CODE"
