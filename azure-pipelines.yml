@@ -10,7 +10,7 @@ trigger:
 
 strategy:
   matrix:
-    Python26:
+    Python27: # will override with 2.6
       python.version: '2.6'
       NOSEOPTS: "--verbose"
       SETUPOPTS: ""
