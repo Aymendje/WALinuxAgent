@@ -10,18 +10,8 @@ pool:
   vmImage: 'ubuntu-latest'
 strategy:
   matrix:
-    Python26:
-      python.version: '2.6'
-      NOSEOPTS: "--verbose"
-      SETUPOPTS: ""
     Python27:
       python.version: '2.7'
-      NOSEOPTS: "--verbose --with-timer"
-      SETUPOPTS: ""
-      PYLINTOPTS: "--rcfile=ci/2.7.pylintrc"
-      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
-    Python34:
-      python.version: '3.4'
       NOSEOPTS: "--verbose --with-timer"
       SETUPOPTS: ""
       PYLINTOPTS: "--rcfile=ci/2.7.pylintrc"
@@ -58,6 +48,15 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
+    echo export NOSEOPTS="$(NOSEOPTS)"
+    echo export SETUPOPTS="$(SETUPOPTS)"
+    echo export PYLINTOPTS="$(PYLINTOPTS)"
+    echo export PYLINTFILES="$(PYLINTFILES)"
+    echo PYTHON_VERSION=$PYTHON_VERSION
+    if [[ $PYTHON_VERSION != 2.6 ]]; then echo ./ci/pylint_and_nosetests.sh; fi
+    if [[ $PYTHON_VERSION == 2.6 ]]; then echo ./ci/nosetests_only.sh; fi
+    if [ ! -z "$SETUPOPTS" ]; then echo /usr/bin/env python setup.py $SETUPOPTS; fi
+    if [[ $PYTHON_VERSION == 3.8 ]]; then echo codecov; fi
     export NOSEOPTS="$(NOSEOPTS)"
     export SETUPOPTS="$(SETUPOPTS)"
     export PYLINTOPTS="$(PYLINTOPTS)"
