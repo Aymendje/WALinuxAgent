@@ -30,7 +30,7 @@ strategy:
       PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
     Python38:
       python.version: '3.8'
-      NOSEOPTS: "--verbose --with-coverage --with-timer --cover-erase --cover-inclusive --cover-min-percentage=60 --cover-branches --cover-package=azurelinuxagent --cover-xml"
+      NOSEOPTS: "--verbose --with-coverage --with-xunit --with-timer --cover-erase --cover-inclusive --cover-min-percentage=60 --cover-branches --cover-package=azurelinuxagent --cover-xml"
       SETUPOPTS: ""
       PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
       PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
@@ -66,13 +66,17 @@ steps:
     if [[ $PYTHON_VERSION == 2.6 ]]; then ./ci/nosetests_only.sh || EXIT_CODE=$(($EXIT_CODE || $?)); fi
     if [ ! -z "$SETUPOPTS" ]; then /usr/bin/env python setup.py $SETUPOPTS || EXIT_CODE=$(($EXIT_CODE || $?)); fi
     if [[ $PYTHON_VERSION == 3.8 ]]; then sudo env "PATH=$PATH" coverage xml; fi
-    if [[ $PYTHON_VERSION == 3.8 ]]; then sudo env "PATH=$PATH" coverage html; fi
     exit $EXIT_CODE
   displayName: 'Run Tests'
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFiles: '$(System.DefaultWorkingDirectory)/**/nosetests.xml'
+    testRunTitle: 'Publish test results for Python $(python.version)'
 
 - task: PublishCodeCoverageResults@1
   inputs:
     codeCoverageTool: Cobertura
     summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
-    reportDirectory: '$(System.DefaultWorkingDirectory)/**/htmlcov'
     testRunTitle: 'Publish test results for Cobertura Python $(python.version)'
