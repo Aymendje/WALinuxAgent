@@ -10,8 +10,8 @@ trigger:
 
 strategy:
   matrix:
-    Python26: # will override with 2.6
-      python.version: '2.7' # will override with 2.6
+    Python26:
+      python.version: '2.6'
       NOSEOPTS: "--verbose"
       SETUPOPTS: ""
       PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
@@ -22,6 +22,7 @@ pool:
 
 steps:
 - task: UsePythonVersion@0
+  -condition: and(ne(python.version, '3.4'), ne(python.version, '2.6'))
   inputs:
     versionSpec: '$(python.version)'
   displayName: 'Use Python $(python.version)'
@@ -37,15 +38,15 @@ steps:
     echo "Installed python2.6"
     python -V
     curl https://bootstrap.pypa.io/2.6/get-pip.py -o get-pip.py
-    python get-pip.py
-    python -m pip install --upgrade pip
+    sudo python get-pip.py
+    sudo python -m pip install --upgrade pip
     echo "Installed pip"
-    python -m pip -V
+    sudo python -m pip -V
     echo "Default pip :"
-    pip -V
+    sudo pip -V
     echo "Installing requirements"
-    pip install -r requirements.txt
-    pip install -r test-requirements.txt
+    sudo pip install -r requirements.txt
+    sudo pip install -r test-requirements.txt
   displayName: 'Install dependencies'
 
 - script: |
