@@ -28,11 +28,17 @@ steps:
 
 - script: |
     sudo add-apt-repository ppa:deadsnakes/ppa -y
-    sudo apt update -y
+    sudo apt-get update -y
     sudo apt install python2.6 -y
     sudo update-alternatives --install /usr/bin/python python /usr/bin/python2.6 1
+    echo "Installed python2.6"
+    python -V
     python -m pip install --upgrade pip
+    echo "Installed pip"
+    python -m pip -V
+    echo "Default pip :"
     pip -V
+    echo "Installing requirements"
     pip install -r requirements.txt
     pip install -r test-requirements.txt
   displayName: 'Install dependencies'
