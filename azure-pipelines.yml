@@ -10,12 +10,12 @@ trigger:
 
 strategy:
   matrix:
-    Python26:
-      python.version: '2.6'
-      NOSEOPTS: "--verbose"
-      SETUPOPTS: ""
-      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
-      imageToUse: 'ubuntu-16.04'
+#    Python26:
+#      python.version: '2.6'
+#      NOSEOPTS: "--verbose"
+#      SETUPOPTS: ""
+#      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+#      imageToUse: 'ubuntu-16.04'
     Python27:
       python.version: '2.7'
       NOSEOPTS: "--verbose --with-timer"
@@ -23,13 +23,13 @@ strategy:
       PYLINTOPTS: "--rcfile=ci/2.7.pylintrc"
       PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
       imageToUse: 'ubuntu-18.04'
-    Python34:
-      python.version: '3.4'
-      NOSEOPTS: "--verbose --with-timer"
-      SETUPOPTS: ""
-      PYLINTOPTS: "--rcfile=ci/2.7.pylintrc"
-      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
-      imageToUse: 'ubuntu-16.04'
+#    Python34:
+#      python.version: '3.4'
+#      NOSEOPTS: "--verbose --with-timer"
+#      SETUPOPTS: ""
+#      PYLINTOPTS: "--rcfile=ci/2.7.pylintrc"
+#      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+#      imageToUse: 'ubuntu-16.04'
     Python36:
       python.version: '3.6'
       NOSEOPTS: "--verbose --with-timer"
