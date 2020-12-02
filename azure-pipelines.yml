@@ -33,7 +33,7 @@ steps:
     if [[ $PYTHON_VERSION != 2.6 ]]; then ./ci/pylint_and_nosetests.sh; fi
     if [[ $PYTHON_VERSION == 2.6 ]]; then ./ci/nosetests_only.sh; fi
     if [ ! -z "$SETUPOPTS" ]; then /usr/bin/env python setup.py $SETUPOPTS; fi
-    if [[ $TRAVIS_PYTHON_VERSION == 3.8 ]]; then codecov; fi
+    if [[ $PYTHON_VERSION == 3.8 ]]; then codecov; fi
   displayName: 'Run Tests'
 
 - task: PublishCodeCoverageResults@1
