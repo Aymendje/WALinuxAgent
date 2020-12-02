@@ -20,62 +20,55 @@ strategy:
 pool:
   vmImage: '$(imageToUse)'
 
-jobs:
-  - job: InitializePython
-    steps:
-    - task: UsePythonVersion@0
-      inputs:
-        versionSpec: '$(parameters.pythonVersion)'
-      displayName: 'Use Python $(parameters.pythonVersion)'
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '$(python.version)'
+  displayName: 'Use Python $(python.version)'
 
-  - job: WorkaroundPython
-    dependsOn: InitializePython
-    condition: failed()
-    steps:
-    - script:  |
-        sudo add-apt-repository ppa:deadsnakes/ppa -y
-        sudo apt-get update -y
-        sudo apt install python2.6 -y
-        sudo update-alternatives --install /usr/bin/python python /usr/bin/python2.6 1
-        sudo update-alternatives --config python
-        PATH="/usr/bin/${PATH:+:${PATH}}"
-        echo $PATH
-        echo "Installed python2.6"
-        python -V
-        curl https://bootstrap.pypa.io/2.6/get-pip.py -o get-pip.py
-        sudo python get-pip.py
+- script:  |
+    sudo add-apt-repository ppa:deadsnakes/ppa -y
+    sudo apt-get update -y
+    sudo apt install python2.6 -y
+    sudo update-alternatives --install /usr/bin/python python /usr/bin/python2.6 1
+    sudo update-alternatives --config python
+    PATH="/usr/bin/${PATH:+:${PATH}}"
+    echo $PATH
+    echo "Installed python2.6"
+    python -V
+    curl https://bootstrap.pypa.io/2.6/get-pip.py -o get-pip.py
+    sudo python get-pip.py
+  condition: failed()
 
-  - job: UnitTest
-    steps:
-    - script: |
-        sudo python -m pip install --upgrade pip
-        sudo pip install -r requirements.txt
-        sudo pip install -r test-requirements.txt
-      displayName: 'Install dependencies'
+- script: |
+    sudo python -m pip install --upgrade pip
+    sudo pip install -r requirements.txt
+    sudo pip install -r test-requirements.txt
+  displayName: 'Install dependencies'
 
-    - script: |
-        echo export NOSEOPTS=\"$(NOSEOPTS)\"
-        echo export SETUPOPTS=\"$(SETUPOPTS)\"
-        echo export PYLINTOPTS=\"$(PYLINTOPTS)\"
-        echo export PYLINTFILES=\"$(PYLINTFILES)\"
-        echo echo PYTHON_VERSION=$PYTHON_VERSION
-        export NOSEOPTS="$(NOSEOPTS)"
-        export SETUPOPTS="$(SETUPOPTS)"
-        export PYLINTOPTS="$(PYLINTOPTS)"
-        export PYLINTFILES="$(PYLINTFILES)"
-        EXIT_CODE=0
-        ./ci/nosetests_only.sh || EXIT_CODE=$(($EXIT_CODE || $?))
-        exit $EXIT_CODE
-      displayName: 'Run Tests'
+- script: |
+    echo export NOSEOPTS=\"$(NOSEOPTS)\"
+    echo export SETUPOPTS=\"$(SETUPOPTS)\"
+    echo export PYLINTOPTS=\"$(PYLINTOPTS)\"
+    echo export PYLINTFILES=\"$(PYLINTFILES)\"
+    echo echo PYTHON_VERSION=$PYTHON_VERSION
+    export NOSEOPTS="$(NOSEOPTS)"
+    export SETUPOPTS="$(SETUPOPTS)"
+    export PYLINTOPTS="$(PYLINTOPTS)"
+    export PYLINTFILES="$(PYLINTFILES)"
+    EXIT_CODE=0
+    ./ci/nosetests_only.sh || EXIT_CODE=$(($EXIT_CODE || $?))
+    exit $EXIT_CODE
+  displayName: 'Run Tests'
 
-    - task: PublishTestResults@2
-      condition: succeededOrFailed()
-      inputs:
-        testResultsFiles: '$(System.DefaultWorkingDirectory)/**/nosetests.xml'
-        testRunTitle: 'Publish test results for Python $(python.version)'
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFiles: '$(System.DefaultWorkingDirectory)/**/nosetests.xml'
+    testRunTitle: 'Publish test results for Python $(python.version)'
 
-    - task: PublishCodeCoverageResults@1
-      inputs:
-        codeCoverageTool: Cobertura
-        summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
-        testRunTitle: 'Publish test results for Cobertura Python $(python.version)'
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: Cobertura
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+    testRunTitle: 'Publish test results for Cobertura Python $(python.version)'
