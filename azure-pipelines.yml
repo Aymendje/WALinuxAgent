@@ -65,6 +65,15 @@ steps:
     if [[ $PYTHON_VERSION != 2.6 ]]; then ./ci/pylint_and_nosetests.sh || EXIT_CODE=$(($EXIT_CODE || $?)); fi
     if [[ $PYTHON_VERSION == 2.6 ]]; then ./ci/nosetests_only.sh || EXIT_CODE=$(($EXIT_CODE || $?)); fi
     if [ ! -z "$SETUPOPTS" ]; then /usr/bin/env python setup.py $SETUPOPTS || EXIT_CODE=$(($EXIT_CODE || $?)); fi
-    if [[ $PYTHON_VERSION == 3.8 ]]  &&  [ $EXIT_CODE -eq 0 ]; then codecov -t $(CODECOV_TOKEN); fi
+    if [[ $PYTHON_VERSION == 3.8 ]]; then sudo env "PATH=$PATH" coverage xml
+    if [[ $PYTHON_VERSION == 3.8 ]]; then sudo env "PATH=$PATH" coverage html
+#    if [[ $PYTHON_VERSION == 3.8 ]]; then codecov -t $(CODECOV_TOKEN); fi
     exit $EXIT_CODE
   displayName: 'Run Tests'
+
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: Cobertura
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+    reportDirectory: '$(System.DefaultWorkingDirectory)/**/htmlcov'
+    testRunTitle: 'Publish test results for Cobertura Python $(python.version)'
