@@ -65,6 +65,6 @@ steps:
     if [[ $PYTHON_VERSION != 2.6 ]]; then ./ci/pylint_and_nosetests.sh || EXIT_CODE=$(($EXIT_CODE || $?)); fi
     if [[ $PYTHON_VERSION == 2.6 ]]; then ./ci/nosetests_only.sh || EXIT_CODE=$(($EXIT_CODE || $?)); fi
     if [ ! -z "$SETUPOPTS" ]; then /usr/bin/env python setup.py $SETUPOPTS || EXIT_CODE=$(($EXIT_CODE || $?)); fi
-    if [[ $PYTHON_VERSION == 3.8 ]] && [EXIT_CODE == 0]; then codecov; fi
+    if [[ $PYTHON_VERSION == 3.8 ]]  &&  [ $EXIT_CODE -eq 0 ]; then codecov; fi
     exit $EXIT_CODE
   displayName: 'Run Tests'
