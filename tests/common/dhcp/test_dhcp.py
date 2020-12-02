@@ -56,22 +56,7 @@ class TestDHCP(AgentTestCase):
         self.assertTrue(dhcp_handler.endpoint is not None)
         self.assertTrue(dhcp_handler.routes is None)
         self.assertTrue(dhcp_handler.gateway is None)
-    """
-    def test_wireserver_route_not_exists(self):
-        # setup
-        dhcp_handler = dhcp.get_dhcp_handler()
-        self.assertTrue(dhcp_handler.endpoint is None)
-        self.assertTrue(dhcp_handler.routes is None)
-        self.assertTrue(dhcp_handler.gateway is None)
 
-        # execute
-        self.assertFalse(dhcp_handler.wireserver_route_exists)
-
-        # test
-        self.assertTrue(dhcp_handler.endpoint is None)
-        self.assertTrue(dhcp_handler.routes is None)
-        self.assertTrue(dhcp_handler.gateway is None)
-    """
     def test_dhcp_cache_exists(self):
         dhcp_handler = dhcp.get_dhcp_handler()
         dhcp_handler.osutil = osutil.DefaultOSUtil()
@@ -83,33 +68,3 @@ class TestDHCP(AgentTestCase):
                           return_value="foo"):
             self.assertTrue(dhcp_handler.dhcp_cache_exists)
             self.assertEqual(dhcp_handler.endpoint, "foo")
-    """
-    def test_dhcp_skip_cache(self):
-        handler = dhcp.get_dhcp_handler()
-        handler.osutil = osutil.DefaultOSUtil()
-        with patch('os.path.exists', return_value=False):
-            with patch.object(osutil.DefaultOSUtil, 'get_dhcp_lease_endpoint')\
-                    as patch_dhcp_cache:
-                with patch.object(dhcp.DhcpHandler, 'send_dhcp_req') \
-                        as patch_dhcp_send:
-
-                    endpoint = 'foo'
-                    patch_dhcp_cache.return_value = endpoint
-
-                    # endpoint comes from cache
-                    self.assertFalse(handler.skip_cache)
-                    handler.run()
-                    self.assertTrue(patch_dhcp_cache.call_count == 1)
-                    self.assertTrue(patch_dhcp_send.call_count == 0)
-                    self.assertTrue(handler.endpoint == endpoint)
-
-                    # reset
-                    handler.skip_cache = True
-                    handler.endpoint = None
-
-                    # endpoint comes from dhcp request
-                    self.assertTrue(handler.skip_cache)
-                    handler.run()
-                    self.assertTrue(patch_dhcp_cache.call_count == 1)
-                    self.assertTrue(patch_dhcp_send.call_count == 1)
-   """
