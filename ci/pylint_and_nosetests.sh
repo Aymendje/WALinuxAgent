@@ -8,8 +8,12 @@ sudo env "PATH=$PATH" nosetests -a 'requires_sudo' tests &> nosetests_sudo.outpu
 
 EXIT_CODE=0
 wait $PYLINT_PID || EXIT_CODE=$(($EXIT_CODE || $?))
+echo pylint EXIT_CODE=$?
 wait $NOSETESTS_PID || EXIT_CODE=$(($EXIT_CODE || $?))
+echo nosetests EXIT_CODE=$?
 wait $NOSETESTS_SUDO_PID || EXIT_CODE=$(($EXIT_CODE || $?))
+echo nosetests sudo EXIT_CODE=$?
+echo combined EXIT_CODE=$(EXIT_CODE)
 
 echo "========================================="
 echo "pylint output:"
