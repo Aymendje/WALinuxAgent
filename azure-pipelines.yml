@@ -25,14 +25,13 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
-    export NOSEOPTS="--verbose --with-coverage --with-timer --cover-inclusive
-          --cover-min-percentage=60 --cover-branches
-          --cover-package=azurelinuxagent --cover-xml"
+    export NOSEOPTS="--verbose --with-coverage --with-timer --cover-inclusive --cover-min-percentage=60 --cover-branches --cover-package=azurelinuxagent --cover-xml"
     export SETUPOPTS=""
     export PYLINTOPTS="--rcfile=ci/3.6.pylintrc"
     export PYLINTFILES="azurelinuxagent setup.py makepkg.py tests"
     printenv
-    ./ci/nosetests_only.sh; fi
+    if [[ $PYTHON_VERSION != 2.6 ]]; then ./ci/pylint_and_nosetests.sh; fi
+    if [[ $PYTHON_VERSION == 2.6 ]]; then ./ci/nosetests_only.sh; fi
     if [ ! -z "$SETUPOPTS" ]; then /usr/bin/env python setup.py $SETUPOPTS; fi
     codecov
   displayName: 'Run Tests'
