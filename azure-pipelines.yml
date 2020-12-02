@@ -24,17 +24,7 @@ pool:
   vmImage: '$(imageToUse)'
 
 steps:
-- script: |
-    echo and(ne(variables.python.version, '3.4'), ne(variables.python.version, '2.6'))
-    echo $(and(ne(variables.python.version, '3.4'), ne(variables.python.version, '2.6')))
-    echo $(variables.python.version)
-  displayName: 'Check python version'
 
-- task: UsePythonVersion@0
-  condition: and(ne(variables.python.version, '3.4'), ne(variables.python.version, '2.6'))
-  inputs:
-    versionSpec: '$(variables.python.version)'
-  displayName: 'Use Python $(variables.python.version)'
 
 - script: |
     sudo add-apt-repository ppa:deadsnakes/ppa -y
