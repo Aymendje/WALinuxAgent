@@ -8,10 +8,13 @@ trigger:
 - master
 - develop
 
+variables:
+  python.version: ""
+
 strategy:
   matrix:
     Python26:
-      python.version: '2.6'
+      variables.python.version: '2.6'
       NOSEOPTS: "--verbose"
       SETUPOPTS: ""
       PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
@@ -21,6 +24,12 @@ pool:
   vmImage: '$(imageToUse)'
 
 steps:
+- task: UsePythonVersion@0
+  condition: and(ne(variables.python.version, '3.4'), ne(variables.python.version, '2.6'))
+  inputs:
+    versionSpec: '$(variables.python.version)'
+  displayName: 'Use Python $(variables.python.version)'
+
 - script: |
     sudo add-apt-repository ppa:deadsnakes/ppa -y
     sudo apt-get update -y
@@ -49,7 +58,6 @@ steps:
     echo export PYLINTOPTS=\"$(PYLINTOPTS)\"
     echo export PYLINTFILES=\"$(PYLINTFILES)\"
     echo echo PYTHON_VERSION=$PYTHON_VERSION
-    exit 1
     export NOSEOPTS="$(NOSEOPTS)"
     export SETUPOPTS="$(SETUPOPTS)"
     export PYLINTOPTS="$(PYLINTOPTS)"
