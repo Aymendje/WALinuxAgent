@@ -68,8 +68,7 @@ steps:
     sudo add-apt-repository ppa:deadsnakes/ppa -y
     sudo apt-get update -y
     sudo apt install python$(python.version) -y
-    sudo update-alternatives --install /usr/bin/python python /usr/bin/python$(python.version) 1
-    sudo update-alternatives --config python
+    sudo ln -sf /usr/bin/python$(python.version) /usr/bin/python
     PATH="/usr/bin/${PATH:+:${PATH}}"
     echo $PATH
     echo "Installed python$(python.version)"
