@@ -16,6 +16,41 @@ strategy:
       SETUPOPTS: ""
       PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
       imageToUse: 'ubuntu-16.04'
+    Python27:
+      python.version: '2.7'
+      NOSEOPTS: "--verbose --with-timer"
+      SETUPOPTS: ""
+      PYLINTOPTS: "--rcfile=ci/2.7.pylintrc"
+      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+      imageToUse: 'ubuntu-18.04'
+    Python34:
+      python.version: '3.4'
+      NOSEOPTS: "--verbose --with-timer"
+      SETUPOPTS: ""
+      PYLINTOPTS: "--rcfile=ci/2.7.pylintrc"
+      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+      imageToUse: 'ubuntu-16.04'
+    Python36:
+      python.version: '3.6'
+      NOSEOPTS: "--verbose --with-timer"
+      SETUPOPTS: ""
+      PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
+      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+      imageToUse: 'ubuntu-18.04'
+    Python37:
+      python.version: '3.7'
+      NOSEOPTS: "--verbose --with-timer"
+      SETUPOPTS: ""
+      PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
+      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+      imageToUse: 'ubuntu-18.04'
+    Python38:
+      python.version: '3.8'
+      NOSEOPTS: "--verbose --with-coverage --with-xunit --with-timer --cover-erase --cover-inclusive --cover-min-percentage=60 --cover-branches --cover-package=azurelinuxagent --cover-xml"
+      SETUPOPTS: ""
+      PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
+      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+      imageToUse: 'ubuntu-latest'
 
 pool:
   vmImage: '$(imageToUse)'
@@ -55,12 +90,20 @@ steps:
     echo export PYLINTOPTS=\"$(PYLINTOPTS)\"
     echo export PYLINTFILES=\"$(PYLINTFILES)\"
     echo echo PYTHON_VERSION=$PYTHON_VERSION
+    if [[ $PYTHON_VERSION != 2.6 ]]; then echo ./ci/pylint_and_nosetests.sh; fi
+    if [[ $PYTHON_VERSION == 2.6 ]]; then echo ./ci/nosetests_only.sh; fi
+    if [ ! -z "$SETUPOPTS" ]; then echo /usr/bin/env python setup.py $SETUPOPTS; fi
+    if [[ $PYTHON_VERSION == 3.8 ]]; then echo codecov; fi
     export NOSEOPTS="$(NOSEOPTS)"
     export SETUPOPTS="$(SETUPOPTS)"
     export PYLINTOPTS="$(PYLINTOPTS)"
     export PYLINTFILES="$(PYLINTFILES)"
     EXIT_CODE=0
-    ./ci/nosetests_only.sh || EXIT_CODE=$(($EXIT_CODE || $?))
+    if [[ $PYTHON_VERSION != 2.6 ]]; then ./ci/pylint_and_nosetests.sh || EXIT_CODE=$(($EXIT_CODE || $?)); fi
+    if [[ $PYTHON_VERSION == 2.6 ]]; then ./ci/nosetests_only.sh || EXIT_CODE=$(($EXIT_CODE || $?)); fi
+    if [ ! -z "$SETUPOPTS" ]; then /usr/bin/env python setup.py $SETUPOPTS || EXIT_CODE=$(($EXIT_CODE || $?)); fi
+    if [[ $PYTHON_VERSION == 3.8 ]]; then sudo env "PATH=$PATH" coverage xml; fi
+    if [[ $PYTHON_VERSION == 3.8 ]]; then codecov -t $(CODECOV_TOKEN); fi
     exit $EXIT_CODE
   displayName: 'Run Tests'
 
