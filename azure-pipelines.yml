@@ -78,9 +78,9 @@ steps:
   displayName: 'Manual install $(python.version)'
 
 - script: |
-    sudo python -m pip install --upgrade pip
-    sudo python -m pip install -r requirements.txt
-    sudo python -m pip install -r test-requirements.txt
+    sudo pip install --upgrade pip
+    sudo pip install -r requirements.txt
+    sudo pip install -r test-requirements.txt
   displayName: 'Install dependencies'
 
 - script: |
