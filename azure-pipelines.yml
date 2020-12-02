@@ -29,5 +29,6 @@ steps:
 
 - script: |
     pip install pytest pytest-azurepipelines
-    sh cl/pylint_and_nosetests.sh
+    ls -alh
+    sh ./cl/pylint_and_nosetests.sh
   displayName: 'pytest'
