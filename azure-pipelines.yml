@@ -23,14 +23,8 @@ strategy:
 pool:
   vmImage: '$(imageToUse)'
 
-steps:
-- script: |
-    echo $(variables.python.version)
-    echo $(and(ne(variables.python.version, '3.4'), ne(variables.python.version, '2.6')))
-  displayName: 'Check python version'
-
 - task: UsePythonVersion@0
-  condition: and(ne(variables.python.version, '3.4'), ne(variables.python.version, '2.6'))
+  condition: and(ne(${{ variables.python.version }}, '3.4'), ne(${{ variables.python.version }}, '2.6'))
   inputs:
     versionSpec: '$(variables.python.version)'
   displayName: 'Use Python $(variables.python.version)'
