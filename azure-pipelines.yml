@@ -24,7 +24,6 @@ steps:
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '$(python.version)'
-  continueOnError: true
   displayName: 'Use Python $(python.version)'
 
 - script:  |
@@ -40,6 +39,7 @@ steps:
     curl https://bootstrap.pypa.io/$(python.version)/get-pip.py -o get-pip.py
     sudo python get-pip.py
   condition: failed()
+  continueOnError: true
   displayName: 'Manual install $(python.version)'
 
 - script: |
