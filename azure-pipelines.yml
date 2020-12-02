@@ -9,7 +9,7 @@ trigger:
 - develop
 
 variables:
-  python.version: ""
+  python.version: "TEST"
 
 strategy:
   matrix:
@@ -24,9 +24,8 @@ pool:
   vmImage: '$(imageToUse)'
 
 steps:
-
 - task: UsePythonVersion@0
-  condition: and(ne(${{ variables.python.version }}, '3.4'), ne(${{ variables.python.version }}, '2.6'))
+  condition: and(ne(${{ $(variables.python.version) }}, '3.4'), ne(${{ variables.python.version }}, '2.6'))
   inputs:
     versionSpec: '$(variables.python.version)'
   displayName: 'Use Python $(variables.python.version)'
