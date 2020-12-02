@@ -10,8 +10,8 @@ trigger:
 
 strategy:
   matrix:
-    Python27: # will override with 2.6
-      python.version: '2.6'
+    Python26: # will override with 2.6
+      python.version: '2.7' # will override with 2.6
       NOSEOPTS: "--verbose"
       SETUPOPTS: ""
       PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
@@ -43,19 +43,12 @@ steps:
     echo export PYLINTOPTS=\"$(PYLINTOPTS)\"
     echo export PYLINTFILES=\"$(PYLINTFILES)\"
     echo echo PYTHON_VERSION=$PYTHON_VERSION
-    if [[ $PYTHON_VERSION != 2.6 ]]; then echo ./ci/pylint_and_nosetests.sh; fi
-    if [[ $PYTHON_VERSION == 2.6 ]]; then echo ./ci/nosetests_only.sh; fi
-    if [ ! -z "$SETUPOPTS" ]; then echo /usr/bin/env python setup.py $SETUPOPTS; fi
-    if [[ $PYTHON_VERSION == 3.8 ]]; then echo codecov; fi
     export NOSEOPTS="$(NOSEOPTS)"
     export SETUPOPTS="$(SETUPOPTS)"
     export PYLINTOPTS="$(PYLINTOPTS)"
     export PYLINTFILES="$(PYLINTFILES)"
     EXIT_CODE=0
-    if [[ $PYTHON_VERSION != 2.6 ]]; then ./ci/pylint_and_nosetests.sh || EXIT_CODE=$(($EXIT_CODE || $?)); fi
-    if [[ $PYTHON_VERSION == 2.6 ]]; then ./ci/nosetests_only.sh || EXIT_CODE=$(($EXIT_CODE || $?)); fi
-    if [ ! -z "$SETUPOPTS" ]; then /usr/bin/env python setup.py $SETUPOPTS || EXIT_CODE=$(($EXIT_CODE || $?)); fi
-    if [[ $PYTHON_VERSION == 3.8 ]]; then sudo env "PATH=$PATH" coverage xml; fi
+    ./ci/nosetests_only.sh || EXIT_CODE=$(($EXIT_CODE || $?)); fi
     exit $EXIT_CODE
   displayName: 'Run Tests'
 
