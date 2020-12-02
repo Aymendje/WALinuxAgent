@@ -23,6 +23,8 @@ strategy:
 pool:
   vmImage: '$(imageToUse)'
 
+steps:
+
 - task: UsePythonVersion@0
   condition: and(ne(${{ variables.python.version }}, '3.4'), ne(${{ variables.python.version }}, '2.6'))
   inputs:
