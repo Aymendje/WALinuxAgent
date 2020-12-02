@@ -79,7 +79,10 @@ steps:
 
 - script: |
     sudo python -m pip install --upgrade pip  || true
-    sudo pip install --upgrade pip
+    echo Python Version
+    echo python -V
+    echo pip Version
+    echo pip -V
     sudo pip install -r requirements.txt
     sudo pip install -r test-requirements.txt
   displayName: 'Install dependencies'
