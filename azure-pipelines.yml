@@ -67,7 +67,7 @@ steps:
     if [[ $PYTHON_VERSION == $CURRENT_VERSION ]]; then echo Python $CURRENT_VERSION already installed. Nothing to do; exit 0; fi
     sudo add-apt-repository ppa:deadsnakes/ppa -y
     sudo apt-get update -y
-    sudo apt install python$(python.version) -y
+    sudo apt install python$(python.version) python$(python.version)-dev -y
     sudo ln -sf /usr/bin/python$(python.version) /usr/bin/python
     PATH="/usr/bin/${PATH:+:${PATH}}"
     echo $PATH
@@ -79,8 +79,8 @@ steps:
 
 - script: |
     sudo python -m pip install --upgrade pip
-    sudo pip install -r requirements.txt
-    sudo pip install -r test-requirements.txt
+    sudo python -m pip install -r requirements.txt
+    sudo python -m pip install -r test-requirements.txt
   displayName: 'Install dependencies'
 
 - script: |
