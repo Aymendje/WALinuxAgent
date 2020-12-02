@@ -20,12 +20,6 @@ strategy:
 pool:
   vmImage: '$(imageToUse)'
 
-steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(python.version)'
-  displayName: 'Use Python $(python.version)'
-
 - script: |
     sudo add-apt-repository ppa:deadsnakes/ppa -y
     sudo apt-get update -y
