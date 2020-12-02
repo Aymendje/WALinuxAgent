@@ -12,45 +12,22 @@ strategy:
   matrix:
     Python26:
       python.version: '2.6'
-      env:
-        NOSEOPTS: "--verbose"
-        SETUPOPTS: ""
+      env: { NOSEOPTS: "--verbose", SETUPOPTS: "" }
     Python27:
       python.version: '2.7'
-      env:
-        NOSEOPTS: "--verbose --with-timer"
-        SETUPOPTS: ""
-        PYLINTOPTS: "--rcfile=ci/2.7.pylintrc"
-        PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+      env: { NOSEOPTS: "--verbose --with-timer", SETUPOPTS: "", PYLINTOPTS: "--rcfile=ci/2.7.pylintrc", PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests" }
     Python34:
       python.version: '3.4'
-      env:
-        NOSEOPTS: "--verbose --with-timer"
-        SETUPOPTS: ""
-        PYLINTOPTS: "--rcfile=ci/2.7.pylintrc"
-        PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+      env: { NOSEOPTS: "--verbose --with-timer", SETUPOPTS: "", PYLINTOPTS: "--rcfile=ci/2.7.pylintrc", PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests" }
     Python36:
       python.version: '3.6'
-      env:
-        NOSEOPTS: "--verbose --with-timer"
-        SETUPOPTS: ""
-        PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
-        PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+      env: { NOSEOPTS: "--verbose --with-timer", SETUPOPTS: "", PYLINTOPTS: "--rcfile=ci/3.6.pylintrc", PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests" }
     Python37:
       python.version: '3.7'
-      env:
-        NOSEOPTS: "--verbose --with-timer"
-        SETUPOPTS: ""
-        PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
-        PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+      env: { NOSEOPTS: "--verbose --with-timer", SETUPOPTS: "", PYLINTOPTS: "--rcfile=ci/3.6.pylintrc", PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests" }
     Python38:
       python.version: '3.8'
-      env:
-        NOSEOPTS: "--verbose --with-coverage --with-timer --cover-inclusive --cover-min-percentage=60 --cover-branches --cover-package=azurelinuxagent --cover-xml"
-        SETUPOPTS: ""
-        PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
-        PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
-
+      env: { NOSEOPTS: "--verbose --with-coverage --with-timer --cover-inclusive --cover-min-percentage=60 --cover-branches --cover-package=azurelinuxagent --cover-xml", SETUPOPTS: "", PYLINTOPTS: "--rcfile=ci/3.6.pylintrc", PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests" }
 steps:
 - task: UsePythonVersion@0
   inputs:
