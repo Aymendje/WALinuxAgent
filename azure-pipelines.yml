@@ -8,15 +8,10 @@ trigger:
 - master
 - develop
 
-parameters:
-  - name: pythonVersion
-    default: 'N/A'
-    type: string
-
 strategy:
   matrix:
     Python26:
-      parameters.pythonVersion: '2.6'
+      python.version: '2.6'
       NOSEOPTS: "--verbose"
       SETUPOPTS: ""
       PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
@@ -25,58 +20,60 @@ strategy:
 pool:
   vmImage: '$(imageToUse)'
 
-steps:
-- task: UsePythonVersion@0
-  condition: and(ne('${{ parameters.pythonVersion }}', '3.4'), ne(parameters.pythonVersion), '2.6'))
-  inputs:
-    versionSpec: '$(parameters.pythonVersion)'
-  displayName: 'Use Python $(parameters.pythonVersion)'
+jobs:
+  - job: InitializePython
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(parameters.pythonVersion)'
+      displayName: 'Use Python $(parameters.pythonVersion)'
 
-- script: |
-    sudo add-apt-repository ppa:deadsnakes/ppa -y
-    sudo apt-get update -y
-    sudo apt install python2.6 -y
-    sudo update-alternatives --install /usr/bin/python python /usr/bin/python2.6 1
-    sudo update-alternatives --config python
-    PATH="/usr/bin/${PATH:+:${PATH}}"
-    echo $PATH
-    echo "Installed python2.6"
-    python -V
-    curl https://bootstrap.pypa.io/2.6/get-pip.py -o get-pip.py
-    sudo python get-pip.py
-    sudo python -m pip install --upgrade pip
-    echo "Installed pip"
-    sudo python -m pip -V
-    echo "Default pip :"
-    sudo pip -V
-    echo "Installing requirements"
-    sudo pip install -r requirements.txt
-    sudo pip install -r test-requirements.txt
-  displayName: 'Install dependencies'
+  - job: WorkaroundPython
+    dependsOn: InitializePython
+    condition: failed()
+    - script:  |
+        sudo add-apt-repository ppa:deadsnakes/ppa -y
+        sudo apt-get update -y
+        sudo apt install python2.6 -y
+        sudo update-alternatives --install /usr/bin/python python /usr/bin/python2.6 1
+        sudo update-alternatives --config python
+        PATH="/usr/bin/${PATH:+:${PATH}}"
+        echo $PATH
+        echo "Installed python2.6"
+        python -V
+        curl https://bootstrap.pypa.io/2.6/get-pip.py -o get-pip.py
+        sudo python get-pip.py
 
-- script: |
-    echo export NOSEOPTS=\"$(NOSEOPTS)\"
-    echo export SETUPOPTS=\"$(SETUPOPTS)\"
-    echo export PYLINTOPTS=\"$(PYLINTOPTS)\"
-    echo export PYLINTFILES=\"$(PYLINTFILES)\"
-    echo echo PYTHON_VERSION=$PYTHON_VERSION
-    export NOSEOPTS="$(NOSEOPTS)"
-    export SETUPOPTS="$(SETUPOPTS)"
-    export PYLINTOPTS="$(PYLINTOPTS)"
-    export PYLINTFILES="$(PYLINTFILES)"
-    EXIT_CODE=0
-    ./ci/nosetests_only.sh || EXIT_CODE=$(($EXIT_CODE || $?))
-    exit $EXIT_CODE
-  displayName: 'Run Tests'
+  - job: UnitTest
+    - script: |
+        sudo python -m pip install --upgrade pip
+        sudo pip install -r requirements.txt
+        sudo pip install -r test-requirements.txt
+      displayName: 'Install dependencies'
 
-- task: PublishTestResults@2
-  condition: succeededOrFailed()
-  inputs:
-    testResultsFiles: '$(System.DefaultWorkingDirectory)/**/nosetests.xml'
-    testRunTitle: 'Publish test results for Python $(python.version)'
+    - script: |
+        echo export NOSEOPTS=\"$(NOSEOPTS)\"
+        echo export SETUPOPTS=\"$(SETUPOPTS)\"
+        echo export PYLINTOPTS=\"$(PYLINTOPTS)\"
+        echo export PYLINTFILES=\"$(PYLINTFILES)\"
+        echo echo PYTHON_VERSION=$PYTHON_VERSION
+        export NOSEOPTS="$(NOSEOPTS)"
+        export SETUPOPTS="$(SETUPOPTS)"
+        export PYLINTOPTS="$(PYLINTOPTS)"
+        export PYLINTFILES="$(PYLINTFILES)"
+        EXIT_CODE=0
+        ./ci/nosetests_only.sh || EXIT_CODE=$(($EXIT_CODE || $?))
+        exit $EXIT_CODE
+      displayName: 'Run Tests'
 
-- task: PublishCodeCoverageResults@1
-  inputs:
-    codeCoverageTool: Cobertura
-    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
-    testRunTitle: 'Publish test results for Cobertura Python $(python.version)'
+    - task: PublishTestResults@2
+      condition: succeededOrFailed()
+      inputs:
+        testResultsFiles: '$(System.DefaultWorkingDirectory)/**/nosetests.xml'
+        testRunTitle: 'Publish test results for Python $(python.version)'
+
+    - task: PublishCodeCoverageResults@1
+      inputs:
+        codeCoverageTool: Cobertura
+        summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+        testRunTitle: 'Publish test results for Cobertura Python $(python.version)'
