@@ -8,13 +8,15 @@ trigger:
 - master
 - develop
 
-variables:
-  python.version: "TEST"
+parameters:
+  - name: pythonVersion
+    default: 'N/A'
+    type: string
 
 strategy:
   matrix:
     Python26:
-      variables.python.version: '2.6'
+      parameters.pythonVersion: '2.6'
       NOSEOPTS: "--verbose"
       SETUPOPTS: ""
       PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
@@ -25,10 +27,10 @@ pool:
 
 steps:
 - task: UsePythonVersion@0
-  condition: and(ne('${{ variables.python.version }}', '3.4'), ne(${{ variables.python.version }}, '2.6'))
+  condition: and(ne('${{ parameters.pythonVersion }}', '3.4'), ne(parameters.pythonVersion), '2.6'))
   inputs:
-    versionSpec: '$(variables.python.version)'
-  displayName: 'Use Python $(variables.python.version)'
+    versionSpec: '$(parameters.pythonVersion)'
+  displayName: 'Use Python $(parameters.pythonVersion)'
 
 - script: |
     sudo add-apt-repository ppa:deadsnakes/ppa -y
