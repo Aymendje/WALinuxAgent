@@ -24,9 +24,12 @@ steps:
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '$(python.version)'
+  continueOnError: true
   displayName: 'Use Python $(python.version)'
 
 - script:  |
+    CURRENT_VERSION=$(python -c 'import sys; print(str(sys.version_info[0])+"."+str(sys.version_info[1]))')
+    if [[ $PYTHON_VERSION == $CURRENT_VERSION ]]; then echo Python $CURRENT_VERSION already installed. Nothing to do; exit 0; fi
     sudo add-apt-repository ppa:deadsnakes/ppa -y
     sudo apt-get update -y
     sudo apt install python$(python.version) -y
@@ -38,8 +41,6 @@ steps:
     python -V
     curl https://bootstrap.pypa.io/$(python.version)/get-pip.py -o get-pip.py
     sudo python get-pip.py
-  condition: failed()
-  continueOnError: true
   displayName: 'Manual install $(python.version)'
 
 - script: |
