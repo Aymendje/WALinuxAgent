@@ -5,35 +5,55 @@
 
 trigger:
 - main
+- master
+- develop
 
-pool:
-  vmImage: 'ubuntu-latest'
 strategy:
   matrix:
+    Python26:
+      python.version: '2.6'
+      NOSEOPTS: "--verbose"
+      SETUPOPTS: ""
+      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests",
+      imageToUse: 'ubuntu-16.04'
     Python27:
       python.version: '2.7'
       NOSEOPTS: "--verbose --with-timer"
       SETUPOPTS: ""
       PYLINTOPTS: "--rcfile=ci/2.7.pylintrc"
-      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests",
+      imageToUse: 'ubuntu-18.04'
+    Python34:
+      python.version: '3.4'
+      NOSEOPTS: "--verbose --with-timer"
+      SETUPOPTS: ""
+      PYLINTOPTS: "--rcfile=ci/2.7.pylintrc"
+      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests",
+      imageToUse: 'ubuntu-16.04'
     Python36:
       python.version: '3.6'
       NOSEOPTS: "--verbose --with-timer"
       SETUPOPTS: ""
       PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
-      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests",
+      imageToUse: 'ubuntu-18.04'
     Python37:
       python.version: '3.7'
       NOSEOPTS: "--verbose --with-timer"
       SETUPOPTS: ""
       PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
-      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests",
+      imageToUse: 'ubuntu-18.04'
     Python38:
       python.version: '3.8'
       NOSEOPTS: "--verbose --with-coverage --with-xunit --with-timer --cover-erase --cover-inclusive --cover-min-percentage=60 --cover-branches --cover-package=azurelinuxagent --cover-xml"
       SETUPOPTS: ""
       PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
-      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+      PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests",
+      imageToUse: 'ubuntu-latest'
+
+pool:
+  vmImage: '$(imageToUse)'
 
 steps:
 - task: UsePythonVersion@0
