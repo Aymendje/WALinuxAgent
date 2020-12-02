@@ -1,32 +1,23 @@
 #!/usr/bin/env bash
 
 set -u
-
-pylint $PYLINTOPTS --jobs=0 $PYLINTFILES &> pylint.output & PYLINT_PID=$!
-nosetests -a '!requires_sudo' tests $NOSEOPTS &> nosetests_no_sudo.output & NOSETESTS_PID=$!
-sudo env "PATH=$PATH" nosetests -a 'requires_sudo' tests $NOSEOPTS &> nosetests_sudo.output & NOSETESTS_SUDO_PID=$!
-
 EXIT_CODE=0
-wait $PYLINT_PID || EXIT_CODE=$(($EXIT_CODE || $?))
-wait $NOSETESTS_PID || EXIT_CODE=$(($EXIT_CODE || $?))
-wait $NOSETESTS_SUDO_PID || EXIT_CODE=$(($EXIT_CODE || $?))
 
 echo "========================================="
 echo "pylint output:"
 echo "========================================="
-
-cat pylint.output
+pylint $PYLINTOPTS --jobs=0 $PYLINTFILES  || EXIT_CODE=$(($EXIT_CODE || $?))
 
 echo
 echo "========================================="
 echo "nosetests -a '!requires_sudo' output:"
 echo "========================================="
-cat nosetests_no_sudo.output
+nosetests -a '!requires_sudo' tests $NOSEOPTS  || EXIT_CODE=$(($EXIT_CODE || $?))
 
 echo
 echo "========================================="
 echo "nosetests -a 'requires_sudo' output:"
 echo "========================================="
-cat nosetests_sudo.output
+sudo env "PATH=$PATH" nosetests -a 'requires_sudo' tests $NOSEOPTS  || EXIT_CODE=$(($EXIT_CODE || $?))
 
 exit "$EXIT_CODE"

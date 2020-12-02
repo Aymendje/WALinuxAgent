@@ -30,7 +30,7 @@ strategy:
       PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
     Python38:
       python.version: '3.8'
-      NOSEOPTS: "--verbose --with-coverage --with-timer --cover-inclusive --cover-min-percentage=60 --cover-branches --cover-package=azurelinuxagent --cover-xml"
+      NOSEOPTS: "--verbose --with-coverage --with-timer --cover-erase --cover-inclusive --cover-min-percentage=60 --cover-branches --cover-package=azurelinuxagent --cover-xml"
       SETUPOPTS: ""
       PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
       PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
