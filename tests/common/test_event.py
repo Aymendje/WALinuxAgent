@@ -396,36 +396,6 @@ class TestEvent(HttpRequestPredicates, AgentTestCase):  # pylint: disable=too-ma
         self.assertEqual(len(event_list), 1)
         self.assertEqual(TestEvent._get_event_message(event_list[0]), u'World\u05e2\u05d9\u05d5\u05ea \u05d0\u05d7\u05e8\u05d5\u05ea\u0906\u091c')
 
-    def test_collect_events_should_ignore_invalid_event_files(self):
-        self._create_test_event_file("custom_script_1.tld")  # a valid event
-        self._create_test_event_file("custom_script_utf-16.tld")
-        self._create_test_event_file("custom_script_invalid_json.tld")
-        os.chmod(self._create_test_event_file("custom_script_no_read_access.tld"), 0o200)
-        self._create_test_event_file("custom_script_2.tld")  # another valid event
-
-        with patch("azurelinuxagent.common.event.add_event") as mock_add_event:
-            event_list = self._collect_events()
-
-            self.assertEqual(
-                len(event_list), 2)
-            self.assertTrue(
-                all(TestEvent._get_event_message(evt) == "A test telemetry message." for evt in event_list),
-                "The valid events were not found")
-
-            invalid_events = []
-            total_dropped_count = 0
-            for args, kwargs in mock_add_event.call_args_list:  # pylint: disable=unused-variable
-                match = re.search(r"DroppedEventsCount: (\d+)", kwargs['message'])
-                if match is not None:
-                    invalid_events.append(kwargs['op'])
-                    total_dropped_count += int(match.groups()[0])
-
-            self.assertEqual(3, total_dropped_count, "Total dropped events dont match")
-            self.assertIn(WALAEventOperation.CollectEventErrors, invalid_events,
-                          "{0} errors not reported".format(WALAEventOperation.CollectEventErrors))
-            self.assertIn(WALAEventOperation.CollectEventUnicodeErrors, invalid_events,
-                          "{0} errors not reported".format(WALAEventOperation.CollectEventUnicodeErrors))
-
     def test_save_event_rollover(self):
         # We keep 1000 events only, and the older ones are removed.
 
