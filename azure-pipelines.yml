@@ -120,8 +120,7 @@ steps:
     fi
     echo pylint $PYLINTOPTS --jobs=0 $PYLINTFILES 
     pylint $PYLINTOPTS --jobs=0 $PYLINTFILES || EXIT_CODE=$(($EXIT_CODE || $?))
-    ls -alh
-    #codecov -t $(CODECOV_TOKEN)
+    codecov -t $(CODECOV_TOKEN)
     exit $EXIT_CODE
   condition: succeededOrFailed()
   displayName: 'Run Coverage'
