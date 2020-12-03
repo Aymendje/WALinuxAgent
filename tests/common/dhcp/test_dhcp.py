@@ -111,7 +111,7 @@ class TestDHCP(AgentTestCase):
                     handler.endpoint = None
 
                     # endpoint comes from dhcp request
-                    self.assertEqual(handler.skip_cache)
+                    self.assertTrue(handler.skip_cache)
                     handler.run()
                     self.assertEqual(patch_dhcp_cache.call_count, 1)
                     self.assertEqual(patch_dhcp_send.call_count, 1)
