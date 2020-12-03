@@ -91,7 +91,7 @@ jobs:
 
     - name: Test with nosetests
       run: |
-        ./ci/nosetests.sh || EXIT_CODE=$?
+        bash ./ci/nosetests.sh || EXIT_CODE=$?
         exit $EXIT_CODE
 
 
