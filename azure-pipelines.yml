@@ -124,7 +124,7 @@ steps:
       EXIT_CODE=0;
     fi
     xunitmerge nosetests.*.xml  nosetests.xml
-    rm -rf nosetests.*.xml
+    ls -alh
     #codecov -t $(CODECOV_TOKEN)
     exit $EXIT_CODE
   condition: succeededOrFailed()
