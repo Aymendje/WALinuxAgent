@@ -8,6 +8,9 @@ trigger:
 - master
 - develop
 
+variables:
+  MIN_COVERAGE_GOAL: 60
+
 strategy:
   matrix:
     Python26:
@@ -46,7 +49,7 @@ strategy:
       imageToUse: 'ubuntu-18.04'
     Python38:
       python.version: '3.8'
-      NOSEOPTS: "--verbose --with-coverage --with-xunit --with-timer --cover-erase --cover-inclusive --cover-min-percentage=60 --cover-branches --cover-package=azurelinuxagent --cover-xml"
+      NOSEOPTS: "--verbose --with-coverage --with-xunit --xunit-file=nosetests.$RANDOM.xml --with-timer --cover-erase --cover-inclusive --cover-branches --cover-package=azurelinuxagent"
       SETUPOPTS: ""
       PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
       PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
@@ -101,15 +104,18 @@ steps:
     if [[ $PYTHON_VERSION != 2.6 ]]; then ./ci/pylint_and_nosetests.sh || EXIT_CODE=$(($EXIT_CODE || $?)); fi
     if [[ $PYTHON_VERSION == 2.6 ]]; then ./ci/nosetests_only.sh || EXIT_CODE=$(($EXIT_CODE || $?)); fi
     if [ ! -z "$SETUPOPTS" ]; then /usr/bin/env python setup.py $SETUPOPTS || EXIT_CODE=$(($EXIT_CODE || $?)); fi
+    if [[ $PYTHON_VERSION == 3.8 ]]; then sudo env "PATH=$PATH" coverage combine; fi
     if [[ $PYTHON_VERSION == 3.8 ]]; then sudo env "PATH=$PATH" coverage xml; fi
-    if [[ $PYTHON_VERSION == 3.8 ]]; then codecov -t $(CODECOV_TOKEN); fi
+    if [[ $PYTHON_VERSION == 3.8 ]]; then COVERAGE_PERCENT=$(coverage report | tail -n 1 | rev | cut -d ' ' -f 1 | rev); fi
+    if [[ $PYTHON_VERSION == 3.8 ]]; then if [ "$COVERAGE_PERCENT" -lt "$(variables.MIN_COVERAGE_GOAL)" ]; then ; EXIT_CODE=1; fi; fi
+    # if [[ $PYTHON_VERSION == 3.8 ]]; then codecov -t $(CODECOV_TOKEN); fi
     exit $EXIT_CODE
   displayName: 'Run Tests'
 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
   inputs:
-    testResultsFiles: '$(System.DefaultWorkingDirectory)/**/nosetests.xml'
+    testResultsFiles: '$(System.DefaultWorkingDirectory)/**/nosetests.*.xml'
     testRunTitle: 'Publish test results for Python $(python.version)'
 
 - task: PublishCodeCoverageResults@1
