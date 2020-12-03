@@ -49,7 +49,7 @@ strategy:
       AZUREIMAGE: 'ubuntu-18.04'
     Python38:
       python.version: '3.8'
-      NOSEOPTS: "--verbose --with-coverage --with-xunit --xunit-file=nosetests.$RANDOM.xml --with-timer --cover-erase --cover-inclusive --cover-branches --cover-package=azurelinuxagent"
+      NOSEOPTS: "--verbose --with-coverage --with-xunit --xunit-file=nosetests.$(uuidgen).xml --with-timer --cover-erase --cover-inclusive --cover-branches --cover-package=azurelinuxagent"
       SETUPOPTS: ""
       PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
       PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
