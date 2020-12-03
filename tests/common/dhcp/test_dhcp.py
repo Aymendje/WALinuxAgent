@@ -15,11 +15,11 @@
 # Requires Python 2.6+ and Openssl 1.0+
 #
 
-import mock
 import os
+import mock
 import azurelinuxagent.common.dhcp as dhcp
 import azurelinuxagent.common.osutil.default as osutil
-from tests.tools import AgentTestCase, open_patch, patch
+from tests.tools import AgentTestCase, open_patch, patch, skip_if_predicate_true
 
 
 class TestDHCP(AgentTestCase):
