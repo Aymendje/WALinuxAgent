@@ -74,7 +74,6 @@ class TestDHCP(AgentTestCase):
         self.assertTrue(dhcp_handler.routes is None)
         self.assertTrue(dhcp_handler.gateway is None)
 
-    #@skip_if_predicate_true(lambda: "AZUREIMAGE" in os.environ, "This test is running on Azure pipeline and should be skipped")
     def test_dhcp_cache_exists(self):
         dhcp_handler = dhcp.get_dhcp_handler()
         dhcp_handler.osutil = osutil.DefaultOSUtil()
@@ -87,6 +86,7 @@ class TestDHCP(AgentTestCase):
             self.assertTrue(dhcp_handler.dhcp_cache_exists)
             self.assertEqual(dhcp_handler.endpoint, "foo")
 
+    @skip_if_predicate_true(lambda: "AZUREIMAGE" in os.environ, "This test is running on Azure pipeline and should be skipped")
     def test_dhcp_skip_cache(self):
         handler = dhcp.get_dhcp_handler()
         handler.osutil = osutil.DefaultOSUtil()
