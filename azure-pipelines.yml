@@ -123,7 +123,7 @@ steps:
       echo Pass coverage check.
       EXIT_CODE=0;
     fi
-    sudo xunitmerge nosetests.*.xml  nosetests.xml
+    xunitmerge nosetests.*.xml  nosetests.xml
     rm -rf nosetests.*.xml
     #codecov -t $(CODECOV_TOKEN)
     exit $EXIT_CODE
