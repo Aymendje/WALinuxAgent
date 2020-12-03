@@ -80,9 +80,9 @@ steps:
 - script: |
     sudo python -m pip install --upgrade pip  || true
     echo Python Version
-    echo python -V
+    python -V
     echo pip Version
-    echo pip -V
+    pip -V
     sudo pip install -r requirements.txt
     sudo pip install -r test-requirements.txt
   displayName: 'Install dependencies'
