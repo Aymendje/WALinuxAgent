@@ -92,13 +92,13 @@ steps:
     echo export PYLINTOPTS=\"$(PYLINTOPTS)\"
     echo export PYLINTFILES=\"$(PYLINTFILES)\"
     echo echo PYTHON_VERSION=$PYTHON_VERSION
-    echo ./ci/nosetests.sh
+    echo bash ./ci/nosetests.sh
     export NOSEOPTS="$(NOSEOPTS)"
     export SETUPOPTS="$(SETUPOPTS)"
     export PYLINTOPTS="$(PYLINTOPTS)"
     export PYLINTFILES="$(PYLINTFILES)"
     EXIT_CODE=0
-    ./ci/nosetests.sh || EXIT_CODE=$(($EXIT_CODE || $?))
+    bash ./ci/nosetests.sh || EXIT_CODE=$(($EXIT_CODE || $?))
     if [ ! -z "$SETUPOPTS" ]; then /usr/bin/env python setup.py $SETUPOPTS || EXIT_CODE=$(($EXIT_CODE || $?)); fi
     exit $EXIT_CODE
   displayName: 'Run Tests'
