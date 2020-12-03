@@ -107,8 +107,8 @@ steps:
     if [[ $PYTHON_VERSION == 3.8 ]]; then sudo env "PATH=$PATH" coverage combine; fi
     if [[ $PYTHON_VERSION == 3.8 ]]; then sudo env "PATH=$PATH" coverage xml; fi
     if [[ $PYTHON_VERSION == 3.8 ]]; then COVERAGE_PERCENT=$(coverage report | tail -n 1 | rev | cut -d ' ' -f 1 | rev); fi
-    if [[ $PYTHON_VERSION == 3.8 ]]; then if [ "$COVERAGE_PERCENT" -lt "$(variables.MIN_COVERAGE_GOAL)" ]; then ; EXIT_CODE=1; fi; fi
     # if [[ $PYTHON_VERSION == 3.8 ]]; then codecov -t $(CODECOV_TOKEN); fi
+    if [[ $PYTHON_VERSION == 3.8 ]]; then if [ "$COVERAGE_PERCENT" -lt "$variables_MIN_COVERAGE_GOAL" ]; then echo Failed coverage check. Found $COVERAGE_PERCENT%, expected minimum of $variables_MIN_COVERAGE_GOAL%; EXIT_CODE=1; fi; fi
     exit $EXIT_CODE
   displayName: 'Run Tests'
 
