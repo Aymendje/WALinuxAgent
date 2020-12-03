@@ -118,7 +118,6 @@ steps:
       echo Failed coverage check. Found $COVERAGE_PERCENT%, expected minimum of $MIN_COVERAGE_GOAL%;
       EXIT_CODE=1;
     fi
-    xunitmerge nosetests.*.xml  nosetests.xml
     echo pylint $PYLINTOPTS --jobs=0 $PYLINTFILES 
     pylint $PYLINTOPTS --jobs=0 $PYLINTFILES || EXIT_CODE=$(($EXIT_CODE || $?))
     ls -alh
@@ -130,7 +129,7 @@ steps:
 - task: PublishTestResults@2
   condition: succeededOrFailed()
   inputs:
-    testResultsFiles: '$(System.DefaultWorkingDirectory)/**/nosetests.xml'
+    testResultsFiles: '$(System.DefaultWorkingDirectory)/**/nosetests.*.xml'
     testRunTitle: 'Publish test results for Python $(python.version)'
 
 - task: PublishCodeCoverageResults@1
