@@ -1,0 +1,142 @@
+name: CI Unit tests
+
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  build:
+
+    name: "Python UT CI Run"
+    runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-16.04
+            python-version: 2.6
+            PYLINTOPTS: ""
+            PYLINTFILES: ""
+            NOSEOPTS: "--verbose"
+
+          - os: ubuntu-latest
+            python-version: 2.7
+            PYLINTOPTS: "--rcfile=ci/2.7.pylintrc"
+            NOSEOPTS: "--verbose --with-timer"
+            PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+
+          - os: ubuntu-16.04
+            python-version: 3.4
+            PYLINTOPTS: "--rcfile=ci/2.7.pylintrc"
+            NOSEOPTS: "--verbose --with-timer"
+            PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+
+          - os: ubuntu-latest
+            python-version: 3.6
+            PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
+            NOSEOPTS: "--verbose --with-timer"
+            PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+
+          - os: ubuntu-latest
+            python-version: 3.7
+            PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
+            NOSEOPTS: "--verbose --with-timer"
+            PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+
+          - os: ubuntu-latest
+            python-version: 3.8
+            PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
+            NOSEOPTS: "--verbose --with-coverage --with-xunit --xunit-file=nosetests.__uuid__.xml
+              --with-timer --cover-erase --cover-inclusive --cover-branches --cover-package=azurelinuxagent"
+            PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+
+    env:
+      PYLINTOPTS: ${{ matrix.PYLINTOPTS }}
+      PYLINTFILES: ${{ matrix.PYLINTFILES }}
+      NOSEOPTS: ${{ matrix.NOSEOPTS }}
+      PYTHON_VERSION: ${{ matrix.python-version }}
+
+    steps:
+    
+    - uses: actions/checkout@v2
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      if: matrix.python-version != 2.6 && matrix.python-version != 3.4
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Manual Install Python ${{ matrix.python-version }}
+      if: matrix.python-version == 2.6 || matrix.python-version == 3.4
+      run: |
+        sudo add-apt-repository ppa:deadsnakes/ppa -y
+        sudo apt-get update -y
+        sudo apt install python$PYTHON_VERSION python$PYTHON_VERSION-dev -y
+        sudo ln -sf /usr/bin/python$PYTHON_VERSION /usr/bin/python
+        PATH="/usr/bin/${PATH:+:${PATH}}"
+        echo $PATH
+        echo "Installed python$PYTHON_VERSION"
+        python -V
+        curl https://bootstrap.pypa.io/$PYTHON_VERSION/get-pip.py -o get-pip.py
+        sudo env "PATH=$PATH" python get-pip.py
+    
+    - name: Install dependencies
+      run: |
+        sudo env "PATH=$PATH" python -m pip install --upgrade pip || true
+        sudo env "PATH=$PATH" pip install -r requirements.txt
+        sudo env "PATH=$PATH" pip install -r test-requirements.txt
+
+    - name: Test with nosetests
+      run: |
+        ./ci/nosetests.sh || EXIT_CODE=$?
+        exit $EXIT_CODE
+
+
+    - name: Run pylint
+      if: always() && matrix.python-version != 2.6
+      run: |
+        pylint $PYLINTOPTS --jobs=0 $PYLINTFILES
+
+    - name: Run Coverage
+      env:
+        MIN_COVERAGE_GOAL: 60
+      if: matrix.python-version == 3.8
+      run: |
+        echo looking for coverage files :
+        ls -alh | grep -i coverage
+        sudo env "PATH=$PATH" coverage combine coverage.*.data
+        sudo env "PATH=$PATH" coverage xml
+        COVERAGE_PERCENT=$(coverage report | tail -n 1 | rev | cut -d ' ' -f 1 | cut -c 2- | rev)
+        EXIT_CODE=1
+        echo Codecoverage : $COVERAGE_PERCENT%
+        if [ "$COVERAGE_PERCENT" -eq "$COVERAGE_PERCENT" ] && [ "$COVERAGE_PERCENT" -gt "$MIN_COVERAGE_GOAL" ]; then 
+          echo Pass coverage check.
+          EXIT_CODE=0;
+        else 
+          echo Failed coverage check. Found $COVERAGE_PERCENT%, expected minimum of $MIN_COVERAGE_GOAL%;
+          EXIT_CODE=1;
+        fi
+        exit $EXIT_CODE
+
+    - name: Upload Coverage
+      if: ${{ github.event_name == 'pull_request' }} && matrix.python-version == 3.8
+      uses: codecov/codecov-action@v1
+      with:
+        file: ./coverage.xml
+
+    - name: Publish Test Report
+      if: matrix.python-version == 3.8
+      uses: mikepenz/action-junit-report@v1
+      with:
+        report_paths: 'nosetests.*.xml'
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Publish Unit Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v1.6
+      if: matrix.python-version == 3.8 && always()
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        files: test-results/**/*.xml
