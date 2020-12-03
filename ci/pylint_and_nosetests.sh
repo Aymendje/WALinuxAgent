@@ -10,21 +10,22 @@ echo "========================================="
 echo "nosetests -a '!requires_sudo' output"
 echo "========================================="
 nosetests -a '!requires_sudo' tests $NOSEOPTS || EXIT_CODE=$(($EXIT_CODE || $?))
-echo EXIT_CODE nosetests = $?
+echo EXIT_CODE nosetests = $EXIT_CODE
 
 
 echo "========================================="
 echo "nosetests -a 'requires_sudo' output"
 echo "========================================="
 sudo env "PATH=$PATH" nosetests -a 'requires_sudo' tests $NOSEOPTS || EXIT_CODE=$(($EXIT_CODE || $?))
-echo EXIT_CODE sudo nosetest = $?
+echo EXIT_CODE sudo nosetest = $EXIT_CODE
 
+wait $PYLINT_PID || EXIT_CODE=$(($EXIT_CODE || $?))
 echo "========================================="
 echo "pylint output:"
 echo "========================================="
-wait $PYLINT_PID || EXIT_CODE=$(($EXIT_CODE || $?))
-pylint $PYLINTOPTS --jobs=0 $PYLINTFILES  || EXIT_CODE=$(($EXIT_CODE || $?))
-echo EXIT_CODE pylint =  $?
+cat pylint.output
+rm pylint.output
+echo EXIT_CODE pylint = $EXIT_CODE
 
 echo Final EXIT_CODE = $EXIT_CODE
 exit "$EXIT_CODE"
