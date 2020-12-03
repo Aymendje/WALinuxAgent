@@ -74,17 +74,17 @@ steps:
     echo "Installed python$(python.version)"
     python -V
     curl https://bootstrap.pypa.io/$(python.version)/get-pip.py -o get-pip.py
-    sudo python get-pip.py
+    sudo env "PATH=$PATH" python get-pip.py
   displayName: 'Manual install $(python.version)'
 
 - script: |
-    sudo python -m pip install --upgrade pip  || true
+    sudo env "PATH=$PATH" python -m pip install --upgrade pip  || true
     echo Python Version
-    sudo python -V
+    sudo env "PATH=$PATH" python -V
     echo pip Version
-    sudo pip -V
-    sudo pip install -r requirements.txt
-    sudo pip install -r test-requirements.txt
+    sudo env "PATH=$PATH" pip -V
+    sudo env "PATH=$PATH" pip install -r requirements.txt
+    sudo env "PATH=$PATH" pip install -r test-requirements.txt
   displayName: 'Install dependencies'
 
 - script: |
