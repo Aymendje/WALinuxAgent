@@ -98,7 +98,7 @@ steps:
     export PYLINTOPTS="$(PYLINTOPTS)"
     export PYLINTFILES="$(PYLINTFILES)"
     EXIT_CODE=0
-    ./ci/nosetests.sh || EXIT_CODE=$(($EXIT_CODE || $?)); fi
+    ./ci/nosetests.sh || EXIT_CODE=$(($EXIT_CODE || $?))
     if [ ! -z "$SETUPOPTS" ]; then /usr/bin/env python setup.py $SETUPOPTS || EXIT_CODE=$(($EXIT_CODE || $?)); fi
     exit $EXIT_CODE
   displayName: 'Run Tests'
@@ -112,12 +112,12 @@ steps:
     VARIABLE_MIN_COVERAGE_GOAL = $MIN_COVERAGE_GOAL
     EXIT_code=1
     echo Codecoverage : $COVERAGE_PERCENT%
-    if [ "$COVERAGE_PERCENT" -lt "$MIN_COVERAGE_GOAL" ]; then 
+    if [ "$COVERAGE_PERCENT" -eq "$COVERAGE_PERCENT" ] && [ "$COVERAGE_PERCENT" -gt "$MIN_COVERAGE_GOAL" ]; then 
+       echo Pass coverage check.
+      EXIT_CODE=0;
+    else 
       echo Failed coverage check. Found $COVERAGE_PERCENT%, expected minimum of $MIN_COVERAGE_GOAL%;
       EXIT_CODE=1;
-    else 
-      echo Pass coverage check.
-      EXIT_CODE=0;
     fi
     xunitmerge nosetests.*.xml  nosetests.xml
     pylint $PYLINTOPTS --jobs=0 $PYLINTFILES || EXIT_CODE=$(($EXIT_CODE || $?))
