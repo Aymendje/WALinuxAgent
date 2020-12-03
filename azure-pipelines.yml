@@ -104,6 +104,7 @@ steps:
     if [[ $PYTHON_VERSION != 2.6 ]]; then ./ci/pylint_and_nosetests.sh || EXIT_CODE=$(($EXIT_CODE || $?)); fi
     if [[ $PYTHON_VERSION == 2.6 ]]; then ./ci/nosetests_only.sh || EXIT_CODE=$(($EXIT_CODE || $?)); fi
     if [ ! -z "$SETUPOPTS" ]; then /usr/bin/env python setup.py $SETUPOPTS || EXIT_CODE=$(($EXIT_CODE || $?)); fi
+    if [[ $PYTHON_VERSION == 3.8 ]]; then echo looking for coverage files :; ls -alh | grep -i coverage; fi
     if [[ $PYTHON_VERSION == 3.8 ]]; then sudo env "PATH=$PATH" coverage combine coverage.*.data; fi
     if [[ $PYTHON_VERSION == 3.8 ]]; then sudo env "PATH=$PATH" coverage xml; fi
     if [[ $PYTHON_VERSION == 3.8 ]]; then COVERAGE_PERCENT=$(coverage report | tail -n 1 | rev | cut -d ' ' -f 1 | rev); fi
