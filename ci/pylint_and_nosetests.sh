@@ -13,7 +13,6 @@ nosetests -a '!requires_sudo' tests $NOSEOPTS || EXIT_CODE=$(($EXIT_CODE || $?))
 echo EXIT_CODE nosetests = $EXIT_CODE
 sudo mv .coverage coverage.$RANDOM.no_requires_sudo.data
 
-
 echo "========================================="
 echo "nosetests -a 'requires_sudo' output"
 echo "========================================="
