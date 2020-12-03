@@ -79,10 +79,6 @@ steps:
 
 - script: |
     sudo env "PATH=$PATH" python -m pip install --upgrade pip  || true
-    echo Python Version
-    sudo env "PATH=$PATH" python -V
-    echo pip Version
-    sudo env "PATH=$PATH" pip -V
     sudo env "PATH=$PATH" pip install -r requirements.txt
     sudo env "PATH=$PATH" pip install -r test-requirements.txt
   displayName: 'Install dependencies'
