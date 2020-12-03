@@ -11,6 +11,7 @@ echo "nosetests -a '!requires_sudo' output"
 echo "========================================="
 nosetests -a '!requires_sudo' tests $NOSEOPTS || EXIT_CODE=$(($EXIT_CODE || $?))
 echo EXIT_CODE nosetests = $EXIT_CODE
+mv .coverage $RANDOM.no_requires_sudo.data
 
 
 echo "========================================="
@@ -18,6 +19,7 @@ echo "nosetests -a 'requires_sudo' output"
 echo "========================================="
 sudo env "PATH=$PATH" nosetests -a 'requires_sudo' tests $NOSEOPTS || EXIT_CODE=$(($EXIT_CODE || $?))
 echo EXIT_CODE sudo nosetest = $EXIT_CODE
+mv .coverage $RANDOM.requires_sudo.data
 
 wait $PYLINT_PID || EXIT_CODE=$(($EXIT_CODE || $?))
 echo "========================================="
