@@ -127,7 +127,8 @@ steps:
     rm -rf nosetests.*.xml
     #codecov -t $(CODECOV_TOKEN)
     exit $EXIT_CODE
-  displayName: 'Run Tests'
+  condition: succeededOrFailed()
+  displayName: 'Run Coverage'
 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
