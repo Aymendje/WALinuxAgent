@@ -49,7 +49,7 @@ strategy:
       AZUREIMAGE: 'ubuntu-18.04'
     Python38:
       python.version: '3.8'
-      NOSEOPTS: "--verbose --with-coverage --with-xunit --xunit-file=nosetests.__uuidgen__.xml --with-timer --cover-erase --cover-inclusive --cover-branches --cover-package=azurelinuxagent"
+      NOSEOPTS: "--verbose --with-coverage --with-xunit --xunit-file=nosetests.__uuid__.xml --with-timer --cover-erase --cover-inclusive --cover-branches --cover-package=azurelinuxagent"
       SETUPOPTS: ""
       PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
       PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
@@ -109,7 +109,6 @@ steps:
     sudo env "PATH=$PATH" coverage combine coverage.*.data
     sudo env "PATH=$PATH" coverage xml
     COVERAGE_PERCENT=$(coverage report | tail -n 1 | rev | cut -d ' ' -f 1 | cut -c 2- | rev)
-    VARIABLE_MIN_COVERAGE_GOAL = $MIN_COVERAGE_GOAL
     EXIT_code=1
     echo Codecoverage : $COVERAGE_PERCENT%
     if [ "$COVERAGE_PERCENT" -eq "$COVERAGE_PERCENT" ] && [ "$COVERAGE_PERCENT" -gt "$MIN_COVERAGE_GOAL" ]; then 
@@ -120,6 +119,7 @@ steps:
       EXIT_CODE=1;
     fi
     xunitmerge nosetests.*.xml  nosetests.xml
+    echo pylint $PYLINTOPTS --jobs=0 $PYLINTFILES 
     pylint $PYLINTOPTS --jobs=0 $PYLINTFILES || EXIT_CODE=$(($EXIT_CODE || $?))
     ls -alh
     #codecov -t $(CODECOV_TOKEN)
