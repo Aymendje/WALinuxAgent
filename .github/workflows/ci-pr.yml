@@ -61,6 +61,10 @@ jobs:
 
     steps:
     
+    - name: Check current Python Version
+      run: |
+        python -V
+    
     - uses: actions/checkout@v2
     
     - name: Set up Python ${{ matrix.python-version }}
