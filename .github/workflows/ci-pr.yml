@@ -71,6 +71,11 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
+    - name: Environment check
+      run: |
+        cat /etc/apt/sources.list | grep -v "#"
+        apt-cache search libssl
+     
     - name: Verify Python ${{ matrix.python-version }} is Default
       run: |
         ver=$(python -V 2>&1)
@@ -82,7 +87,7 @@ jobs:
     
     - name: Install dependencies
       run: |
-        apt-get install libssl-dev
+        apt-get install libssl-dev -y
         python -m pip install --upgrade pip || true
         pip install virtualenv
         pip install -r requirements.txt
