@@ -69,7 +69,7 @@ jobs:
       run: |
         apt update -y && apt upgrade -y
         apt install libssl-dev openssl uuid-runtime -y
-       [ "$PYTHON_VERSION" = "2.6" ] && apt install python2.6 -y
+        [ "$PYTHON_VERSION" = "2.6" ] && apt install python2.6 -y
     
     - name: Set up Python ${{ matrix.python-version }}
       if: matrix.python-version != 2.6
