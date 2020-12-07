@@ -15,38 +15,38 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - container: 'ubuntu:14.04'
-            python-version: 2.6
+          - python-version: 2.6
+            container: 'ubuntu:14.04'
             PYLINTOPTS: ""
             PYLINTFILES: ""
             NOSEOPTS: "--verbose"
 
-          - container: "ubuntu:18.04"
-            python-version: 2.7
+          - python-version: 2.7
+            container: "ubuntu:18.04"
             PYLINTOPTS: "--rcfile=ci/2.7.pylintrc"
             NOSEOPTS: "--verbose --with-timer"
             PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
 
-          - container: "ubuntu:18.04"
-            python-version: 3.4
+          - python-version: 3.4
+            container: "ubuntu:18.04"
             PYLINTOPTS: "--rcfile=ci/2.7.pylintrc"
             NOSEOPTS: "--verbose --with-timer"
             PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
 
-          - container: "ubuntu:18.04"
-            python-version: 3.6
+          - python-version: 3.6
+            container: "ubuntu:18.04"
             PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
             NOSEOPTS: "--verbose --with-timer"
             PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
 
-          - container: "ubuntu:18.04"
-            python-version: 3.7
+          - python-version: 3.7
+            container: "ubuntu:18.04"
             PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
             NOSEOPTS: "--verbose --with-timer"
             PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
 
-          - container: "ubuntu:18.04"
-            python-version: 3.8
+          - python-version: 3.8
+            container: "ubuntu:18.04"
             PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
             NOSEOPTS: "--verbose --with-coverage --with-xunit --xunit-file=nosetests.__uuid__.xml
               --with-timer --cover-erase --cover-inclusive --cover-branches --cover-package=azurelinuxagent"
@@ -64,6 +64,12 @@ jobs:
     steps:
     
     - uses: actions/checkout@v2
+
+    - name: Set up Container
+      run: |
+        apt update -y && apt upgrade -y
+        apt install libssl-dev openssl uuid-runtime -y
+        test $PYTHON_VERSION == "2.6" && apt install python2.6 -y
     
     - name: Set up Python ${{ matrix.python-version }}
       if: matrix.python-version != 2.6
@@ -71,15 +77,10 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Environment check
-      run: |
-        cat /etc/apt/sources.list | grep -v "#"
-        apt-cache search libssl
-     
     - name: Verify Python ${{ matrix.python-version }} is Default
       run: |
-        ver=$(python -V 2>&1)
-        echo $ver
+        echo "Python version output:"
+        python -V 2>&1
         case $(python -V 2>&1) in
           "Python $PYTHON_VERSION"*) exit 0 ;;
           *) exit 1 ;;
@@ -87,9 +88,7 @@ jobs:
     
     - name: Install dependencies
       run: |
-        apt-get install libssl-dev -y
-        python -m pip install --upgrade pip || true
-        pip install virtualenv
+        python -m pip install --upgrade pip && pip install virtualenv || [ PYTHON_VERSION == "2.6" ]
         pip install -r requirements.txt
         pip install -r test-requirements.txt
 
