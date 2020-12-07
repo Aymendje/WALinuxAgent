@@ -9,14 +9,14 @@ echo "nosetests -a '!requires_sudo' output"
 echo "========================================="
 nosetests -a '!requires_sudo' tests $(echo "${NOSEOPTS/__uuid__/$(uuidgen)}") || EXIT_CODE=$(($EXIT_CODE || $?))
 echo EXIT_CODE nosetests = $EXIT_CODE
-sudo mv .coverage coverage.$(uuidgen).no_requires_sudo.data
+mv .coverage coverage.$(uuidgen).no_requires_sudo.data
 
 echo "========================================="
 echo "nosetests -a 'requires_sudo' output"
 echo "========================================="
-sudo env "PATH=$PATH" nosetests -a 'requires_sudo' tests $(echo "${NOSEOPTS/__uuid__/$(uuidgen)}") || EXIT_CODE=$(($EXIT_CODE || $?))
+nosetests -a 'requires_sudo' tests $(echo "${NOSEOPTS/__uuid__/$(uuidgen)}") || EXIT_CODE=$(($EXIT_CODE || $?))
 echo EXIT_CODE sudo nosetest = $EXIT_CODE
-sudo mv .coverage coverage.$(uuidgen).requires_sudo.data
+mv .coverage coverage.$(uuidgen).requires_sudo.data
 
 echo Final EXIT_CODE = $EXIT_CODE
 exit "$EXIT_CODE"
