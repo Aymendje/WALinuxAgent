@@ -10,48 +10,50 @@ jobs:
   build:
 
     name: "Python UT CI Run"
-    runs-on: ubuntu-latest
     
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-14.04
+          - container: 'ubuntu:14.04'
             python-version: 2.6
             PYLINTOPTS: ""
             PYLINTFILES: ""
             NOSEOPTS: "--verbose"
 
-          - os: ubuntu-latest
+          - container: "ubuntu:18.04"
             python-version: 2.7
             PYLINTOPTS: "--rcfile=ci/2.7.pylintrc"
             NOSEOPTS: "--verbose --with-timer"
             PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
 
-          - os: ubuntu-16.04
+          - container: "ubuntu:18.04"
             python-version: 3.4
             PYLINTOPTS: "--rcfile=ci/2.7.pylintrc"
             NOSEOPTS: "--verbose --with-timer"
             PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
 
-          - os: ubuntu-latest
+          - container: "ubuntu:18.04"
             python-version: 3.6
             PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
             NOSEOPTS: "--verbose --with-timer"
             PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
 
-          - os: ubuntu-latest
+          - container: "ubuntu:18.04"
             python-version: 3.7
             PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
             NOSEOPTS: "--verbose --with-timer"
             PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
 
-          - os: ubuntu-latest
+          - container: "ubuntu:18.04"
             python-version: 3.8
             PYLINTOPTS: "--rcfile=ci/3.6.pylintrc"
             NOSEOPTS: "--verbose --with-coverage --with-xunit --xunit-file=nosetests.__uuid__.xml
               --with-timer --cover-erase --cover-inclusive --cover-branches --cover-package=azurelinuxagent"
             PYLINTFILES: "azurelinuxagent setup.py makepkg.py tests"
+
+    runs-on: ubuntu-latest
+    container: ${{ matrix.container }}
 
     env:
       PYLINTOPTS: ${{ matrix.PYLINTOPTS }}
@@ -61,26 +63,34 @@ jobs:
 
     steps:
     
-    - name: Check current Python Version
-      run: |
-        python -V
-    
     - uses: actions/checkout@v2
     
     - name: Set up Python ${{ matrix.python-version }}
+      if: matrix.python-version != 2.6
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
+    - name: Verify Python ${{ matrix.python-version }} is Default
+      run: |
+        ver=$(python -V 2>&1)
+        echo $ver
+        case $(python -V 2>&1) in
+          "Python $PYTHON_VERSION"*) exit 0 ;;
+          *) exit 1 ;;
+        esac
     
     - name: Install dependencies
       run: |
-        sudo env "PATH=$PATH" python -m pip install --upgrade pip || true
-        sudo env "PATH=$PATH" pip install -r requirements.txt
-        sudo env "PATH=$PATH" pip install -r test-requirements.txt
+        apt-get install libssl-dev
+        python -m pip install --upgrade pip || true
+        pip install virtualenv
+        pip install -r requirements.txt
+        pip install -r test-requirements.txt
 
     - name: Test with nosetests
       run: |
-        bash ./ci/nosetests.sh || EXIT_CODE=$?
+        ./ci/nosetests.sh || EXIT_CODE=$?
         exit $EXIT_CODE
 
 
@@ -96,8 +106,8 @@ jobs:
       run: |
         echo looking for coverage files :
         ls -alh | grep -i coverage
-        sudo env "PATH=$PATH" coverage combine coverage.*.data
-        sudo env "PATH=$PATH" coverage xml
+        coverage combine coverage.*.data
+        coverage xml
         COVERAGE_PERCENT=$(coverage report | tail -n 1 | rev | cut -d ' ' -f 1 | cut -c 2- | rev)
         EXIT_CODE=1
         echo Codecoverage : $COVERAGE_PERCENT%
@@ -117,15 +127,8 @@ jobs:
         file: ./coverage.xml
 
     - name: Publish Test Report
-      if: matrix.python-version == 3.8
+      if: always() && matrix.python-version == 3.8
       uses: mikepenz/action-junit-report@v1
       with:
         report_paths: 'nosetests.*.xml'
         github_token: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: Publish Unit Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v1.6
-      if: matrix.python-version == 3.8 && always()
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        files: test-results/**/*.xml
